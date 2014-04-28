@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>MDPV</title>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+  <script>
+    $(function(){
+      var mdpvRoot = 'http://mdpv.herokuapp.com/'
+      var observeInterval = 500;
+
+      var cssUrl = mdpvRoot + 'style.css';
+      var previewUrl = mdpvRoot + 'preview';
+
+      var file = null;
+      var lastMod = null;
+      var lastText = null;
+      var reader = new FileReader();
+      var $preview = $('div.markdown')
+
+      $('head').append($('<link rel="stylesheet" type="text/css" href="' + cssUrl + '">'));
+
+      var $window = $(window)
+      var adjustHeight = function(){
+        $preview.css('height', $window.height() - $preview.position().top - 40)
+      }
+      $window.on('resize', adjustHeight)
+      adjustHeight()
+
+      $('#file').on('change', function(){
+        var f = document.getElementById("file").files[0];
+        if(f == undefined){
+          file = null;
+          lastMod = null;
+          lastText = null;
+          $preview.empty();
+        }else{
+          file = f;
+          observe();
+        }
+      });
+
+      var observe = function(){
+        if(file == null) return;
+        if(lastMod != null && file.lastModifiedDate.toGMTString() == lastMod.toGMTString()){
+          setTimeout(observe, observeInterval);
+          return;
+        }
+        lastMod = file.lastModifiedDate;
+        reader.readAsText(file, 'utf-8');
+      };
+      reader.onload = function(evt){
+        var text = evt.target.result;
+        if(text == lastText){
+          setTimeout(observe, observeInterval);
+          return;
+        }
+        lastText = text;
+        preview(text);
+        setTimeout(observe, observeInterval);
+      };
+      var preview = function(text){
+        $.ajax({
+          type: 'POST',
+          url: previewUrl,
+          data: {text: text},
+          success: function(res){
+            var $last = $preview.find('>:last-child')
+            var scrollBottom = false
+            if($last && $last.offset()){
+              console.log($preview.height())
+              console.log($last.offset().top - $preview.offset().top + $last.outerHeight())
+              scrollBottom = ($last.offset().top - $preview.offset().top + $last.outerHeight()) <= $preview.height()
+            }
+            $preview.html(res);
+            if(scrollBottom){
+              $preview.scrollTop($preview.scrollTop() + 500)
+            }
+          }
+        });
+      }
+    });
+  </script>
+  <style type="text/css">
+    * {
+      font-size: 14px;
+      line-height: 20px;
+    }
+    body {
+      padding: 10px;
+    }
+    div.markdown {
+      overflow: scroll;
+      padding: 10px;
+      border: solid 1px #999;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <input type="file" id="file" name="file" />
+  <div class="markdown"></div>
+</body>
+</html>

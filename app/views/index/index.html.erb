@@ -1,0 +1,11 @@
+<div class="row max-height">
+  <div id="input-pane" class="col-xs-6 max-height">
+    <%= form_tag preview_path, id: 'input-form', class: 'max-height', remote: true do %>
+      <%=text_area_tag :text, @text, class: 'max-height' %>
+    <% end %>
+  </div>
+  <div id="preview-pane" class="col-xs-6 max-height">
+    <div class="markdown max-height"></div>
+  </div>
+</div>
+

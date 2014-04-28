@@ -1,0 +1,39 @@
+// Place all the styles related to the index controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+div.container {
+  width: 100%;
+}
+
+div.main-area {
+  height: 500px;
+
+  .max-height {
+    height: 100%;
+    min-height: 100%;
+    max-height: 100%;
+  }
+
+  textarea, div.markdown {
+    width: 100%;
+  }
+
+  div.markdown {
+    overflow: scroll;
+    border: solid 1px #666;
+    padding: 10px;
+  }
+
+  #input-pane {
+    padding-right: 8px;
+  }
+  #preview-pane {
+    padding-left: 8px;
+  }
+}
+
+.navbar {
+  margin-bottom: 15px;
+}
+
